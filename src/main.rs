@@ -1,24 +1,23 @@
-use askama::Template;
-use askama_axum::IntoResponse;
-use axum::{routing::get, Router};
+use axum::{routing::get, Extension, Router};
+use dotenvy_macro::dotenv;
+use htmx_rust_something1::controllers::hello::hello;
+use sqlx::postgres::PgPoolOptions;
 use tower_http::services::ServeDir;
-
-#[derive(Template)]
-#[template(path = "hello.html")]
-struct HelloTemplate<'a> {
-    name: &'a str,
-}
-
-pub async fn hello() -> Result<impl IntoResponse, std::convert::Infallible> {
-    let hello = HelloTemplate { name: "world" };
-    Ok(hello)
-}
 
 #[tokio::main]
 async fn main() {
+    let database_url = dotenv!("DATABASE_URL");
+
+    let pool = PgPoolOptions::new()
+        .max_connections(50)
+        .connect(&database_url)
+        .await
+        .unwrap();
+
     let app = Router::new()
         .route("/", get(hello))
-        .nest_service("/static", ServeDir::new("static"));
+        .nest_service("/static", ServeDir::new("static"))
+        .layer(Extension(pool));
 
     axum::Server::bind(&"0.0.0.0:3000".parse().unwrap())
         .serve(app.into_make_service())
