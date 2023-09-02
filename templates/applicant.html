@@ -1,0 +1,9 @@
+<h2>{{ applicant.name }}</h2>
+<p>Email: {{ applicant.email }}</p>
+{% if let Some(resume_url) = applicant.resume_url %}
+<p>Resume: <a href="{{ resume_url }}">Download</a></p>
+{% endif %}
+{% if let Some(cover_letter) = applicant.cover_letter %}
+<p>Cover letter:</p>
+<pre>{{ cover_letter }}</pre>
+{% endif %}

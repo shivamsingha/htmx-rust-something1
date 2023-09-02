@@ -1,0 +1,13 @@
+<h2>{{ job.title }}</h2>
+{% if let Some(description) = job.description %}
+<p>{{ description }}</p>
+{% endif %}
+{% if let Some(location) = job.location %}
+<p>Location: {{ location }}</p>
+{% endif %}
+{% if let Some(salary) = job.salary %}
+<p>Salary: {{ salary }}</p>
+{% endif %}
+{% if let Some(expires_at) = job.expires_at %}
+<p>Expires at: {{ expires_at }}</p>
+{% endif %}
