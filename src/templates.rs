@@ -10,24 +10,24 @@ pub struct HelloTemplate<'a> {
 
 #[derive(Template)]
 #[template(path = "company.html")]
-pub struct CompanyTemplate<'a> {
-    pub company: &'a Company,
+pub struct CompanyTemplate {
+    pub company: Company,
 }
 
 #[derive(Template)]
 #[template(path = "job.html")]
-pub struct JobTemplate<'a> {
-    pub job: &'a Job,
+pub struct JobTemplate {
+    pub job: Job,
 }
 
 #[derive(Template)]
 #[template(path = "applicant.html")]
-pub struct ApplicantTemplate<'a> {
-    pub applicant: &'a Applicant,
+pub struct ApplicantTemplate {
+    pub applicant: Applicant,
 }
 
 #[derive(Template)]
 #[template(path = "application.html")]
-pub struct ApplicationTemplate<'a> {
-    pub application: &'a Application,
+pub struct ApplicationTemplate {
+    pub application: Application,
 }
