@@ -12,7 +12,7 @@ serde = { version = "1.0.183", features = ["derive"] }
 serde_json = "1.0.104"
 tower-http = { version = "0.4.3", features = ["fs", "compression-br"] }
 tower = "0.4.13"
-sqlx = { version = "0.7.1", features = ["runtime-tokio", "chrono", "postgres"] }
+sqlx = { version = "0.7.1", features = ["runtime-tokio", "chrono", "postgres", "bigdecimal"] }
 askama = { version = "0.12.0", features = ["with-axum", "serde-json"] }
 askama_axum = "0.3.0"
 dotenvy = "0.15.7"

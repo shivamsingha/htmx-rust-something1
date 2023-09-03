@@ -1,6 +1,9 @@
 use axum::{routing::get, Extension, Router};
 use dotenvy_macro::dotenv;
-use htmx_rust_something1::controllers::hello::hello;
+use htmx_rust_something1::controllers::{
+    applicant::get_applicant, application::get_application, company::get_company, hello::hello,
+    job::get_job,
+};
 use sqlx::postgres::PgPoolOptions;
 use tower_http::services::ServeDir;
 
@@ -16,6 +19,10 @@ async fn main() {
 
     let app = Router::new()
         .route("/", get(hello))
+        .route("/company/:id", get(get_company))
+        .route("/job/:id", get(get_job))
+        .route("/applicant/:id", get(get_applicant))
+        .route("/application/:id", get(get_application))
         .nest_service("/static", ServeDir::new("static"))
         .layer(Extension(pool));
 
