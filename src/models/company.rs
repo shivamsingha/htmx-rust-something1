@@ -8,3 +8,9 @@ pub struct Company {
     pub website: Option<String>,
     pub logo_url: Option<String>,
 }
+
+#[derive(Debug, FromRow)]
+pub struct CompanyIdName {
+    pub id: i32,
+    pub name: String,
+}

@@ -1,4 +1,7 @@
-use sqlx::{FromRow, types::{chrono, BigDecimal}};
+use sqlx::{
+    types::{chrono, BigDecimal},
+    FromRow,
+};
 
 #[derive(Debug, FromRow)]
 pub struct Job {
@@ -10,4 +13,8 @@ pub struct Job {
     pub salary: Option<BigDecimal>,
     pub created_at: chrono::NaiveDateTime,
     pub expires_at: Option<chrono::NaiveDateTime>,
+}
+
+pub struct JobLocation {
+    location: String,
 }

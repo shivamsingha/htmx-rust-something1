@@ -1,11 +1,23 @@
 use askama::Template;
 
-use crate::models::{job::Job, applicant::Applicant, application::Application, company::Company};
+use crate::models::{
+    applicant::Applicant,
+    application::Application,
+    company::{Company, CompanyIdName},
+    job::{Job, JobLocation},
+};
 
 #[derive(Template)]
 #[template(path = "hello.html")]
 pub struct HelloTemplate<'a> {
     pub name: &'a str,
+}
+
+#[derive(Template)]
+#[template(path = "home.html")]
+pub struct HomeTemplate {
+    pub companies: Vec<CompanyIdName>,
+    pub locations: Vec<JobLocation>,
 }
 
 #[derive(Template)]
