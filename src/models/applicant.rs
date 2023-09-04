@@ -1,4 +1,4 @@
-use sqlx::{FromRow, types::chrono};
+use sqlx::{types::chrono, FromRow};
 
 #[derive(Debug, FromRow)]
 pub struct Applicant {

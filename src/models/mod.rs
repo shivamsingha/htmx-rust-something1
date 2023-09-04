@@ -1,4 +1,4 @@
-pub mod job;
 pub mod applicant;
-pub mod company;
 pub mod application;
+pub mod company;
+pub mod job;
