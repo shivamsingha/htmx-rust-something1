@@ -1,10 +1,5 @@
 {% extends "base.html" %} {% block body %}
-<form
-    hx-get="/jobs"
-    hx-trigger="change"
-    hx-target="#jobs-box"
-    hx-swap="innerHTML"
->
+<form hx-get="/jobs" hx-trigger="changed delay:1s" hx-target="#jobs-box">
     <label for="Search">Search</label>
     <input
         type="text"
@@ -25,8 +20,8 @@
 
     <select name="location" id="location" multiple>
         <option value="" disabled selected>Filter by Location</option>
-        {% for location in locations %}
-        <option value="{{ location }}">{{ location }}</option>
+        {% for x in locations %}
+        <option value="{{ x.location }}">{{ x.location }}</option>
         {% endfor %}
     </select>
 
@@ -49,15 +44,32 @@
 
     <label for="sort_by">Sort By:</label>
     <select name="sort_by" id="sort_by">
+        <option value="" disabled selected></option>
         <option value="title">Title</option>
         <option value="salary">Salary</option>
     </select>
 
     <label for="sort_direction">Sort Direction:</label>
     <select name="sort_direction" id="sort_direction">
+        <option value="" disabled selected></option>
         <option value="asc">Ascending</option>
         <option value="desc">Descending</option>
     </select>
+
+    <label for="size">Page Size:</label>
+    <select name="size" id="size">
+        <option value="10" selected>10</option>
+        <option value="50">50</option>
+        <option value="100">100</option>
+    </select>
+
+    <label for="page">Page:</label>
+    <select name="page" id="page">
+        <option value="" disabled selected></option>
+        <option value="1">1</option>
+        <option value="2">2</option>
+    </select>
 </form>
-<div id="jobs-box"></div>
+<div id="jobs-box">
+</div>
 {% endblock body %}

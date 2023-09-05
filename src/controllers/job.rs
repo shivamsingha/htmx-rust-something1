@@ -1,7 +1,10 @@
 use axum::{extract::Path, Extension};
 use sqlx::{Pool, Postgres};
 
-use crate::{models::job::Job, templates::JobTemplate};
+use crate::{
+    models::job::Job,
+    templates::{JobTemplate, ListJobsTemplate},
+};
 
 pub async fn get_job(
     Path(id): Path<i32>,
@@ -13,6 +16,18 @@ pub async fn get_job(
         .unwrap();
 
     JobTemplate { job }
+}
+
+pub async fn list_jobs(Extension(conn): Extension<Pool<Postgres>>) -> ListJobsTemplate {
+    let jobs = sqlx::query_as!(
+        Job,
+        "SELECT * FROM jobs WHERE expires_at > NOW() OR expires_at IS NULL"
+    )
+    .fetch_all(&conn)
+    .await
+    .unwrap();
+
+    ListJobsTemplate { jobs }
 }
 
 pub async fn update_jobs(

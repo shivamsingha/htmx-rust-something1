@@ -21,6 +21,12 @@ pub struct HomeTemplate {
 }
 
 #[derive(Template)]
+#[template(path = "partials/list_jobs.html")]
+pub struct ListJobsTemplate {
+    pub jobs: Vec<Job>,
+}
+
+#[derive(Template)]
 #[template(path = "company.html")]
 pub struct CompanyTemplate {
     pub company: Company,

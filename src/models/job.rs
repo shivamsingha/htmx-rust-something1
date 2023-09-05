@@ -16,5 +16,5 @@ pub struct Job {
 }
 
 pub struct JobLocation {
-    location: String,
+    pub location: String,
 }
