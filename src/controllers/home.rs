@@ -2,7 +2,10 @@ use axum::Extension;
 use sqlx::{Pool, Postgres};
 
 use crate::{
-    models::{company::CompanyIdName, job::{JobLocation, Job}},
+    models::{
+        company::CompanyIdName,
+        job::{Job, JobLocation},
+    },
     templates::HomeTemplate,
 };
 
