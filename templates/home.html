@@ -1,5 +1,5 @@
 {% extends "base.html" %} {% block body %}
-<form hx-get="/jobs" hx-trigger="changed delay:1s" hx-target="#jobs-box">
+<form hx-get="/jobs" hx-trigger="change" hx-target="#jobs-box">
     <label for="Search">Search</label>
     <input
         type="text"
@@ -70,6 +70,5 @@
         <option value="2">2</option>
     </select>
 </form>
-<div id="jobs-box">
-</div>
+<div id="jobs-box">{% include "partials/list_jobs.html" %}</div>
 {% endblock body %}

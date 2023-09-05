@@ -18,6 +18,7 @@ pub struct HelloTemplate<'a> {
 pub struct HomeTemplate {
     pub companies: Vec<CompanyIdName>,
     pub locations: Vec<JobLocation>,
+    pub jobs: Vec<Job>,
 }
 
 #[derive(Template)]

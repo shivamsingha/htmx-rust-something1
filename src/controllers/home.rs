@@ -2,7 +2,7 @@ use axum::Extension;
 use sqlx::{Pool, Postgres};
 
 use crate::{
-    models::{company::CompanyIdName, job::JobLocation},
+    models::{company::CompanyIdName, job::{JobLocation, Job}},
     templates::HomeTemplate,
 };
 
@@ -20,8 +20,17 @@ pub async fn home(Extension(conn): Extension<Pool<Postgres>>) -> HomeTemplate {
     .await
     .unwrap();
 
+    let jobs = sqlx::query_as!(
+        Job,
+        "SELECT * FROM jobs WHERE expires_at > NOW() OR expires_at IS NULL LIMIT 10"
+    )
+    .fetch_all(&conn)
+    .await
+    .unwrap();
+
     HomeTemplate {
         companies,
         locations,
+        jobs,
     }
 }
