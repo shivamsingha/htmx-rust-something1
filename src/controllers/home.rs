@@ -4,7 +4,7 @@ use sqlx::{Pool, Postgres};
 use crate::{
     models::{
         company::CompanyIdName,
-        job::{Job, JobLocation},
+        job::{JobLocation, JobWithCompany},
     },
     templates::HomeTemplate,
 };
@@ -24,8 +24,13 @@ pub async fn home(Extension(conn): Extension<Pool<Postgres>>) -> HomeTemplate {
     .unwrap();
 
     let jobs = sqlx::query_as!(
-        Job,
-        "SELECT * FROM jobs WHERE expires_at > NOW() OR expires_at IS NULL LIMIT 10"
+        JobWithCompany,
+        "SELECT jobs.*, companies.name AS company_name 
+        FROM jobs 
+        INNER JOIN companies ON jobs.company_id = companies.id 
+        WHERE expires_at > NOW() OR expires_at IS NULL 
+        ORDER BY id 
+        LIMIT 10",
     )
     .fetch_all(&conn)
     .await

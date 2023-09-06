@@ -4,7 +4,7 @@ use crate::models::{
     applicant::Applicant,
     application::Application,
     company::{Company, CompanyIdName},
-    job::{Job, JobLocation},
+    job::{Job, JobLocation, JobWithCompany},
 };
 
 #[derive(Template)]
@@ -18,13 +18,13 @@ pub struct HelloTemplate<'a> {
 pub struct HomeTemplate {
     pub companies: Vec<CompanyIdName>,
     pub locations: Vec<JobLocation>,
-    pub jobs: Vec<Job>,
+    pub jobs: Vec<JobWithCompany>,
 }
 
 #[derive(Template)]
 #[template(path = "partials/list_jobs.html")]
 pub struct ListJobsTemplate {
-    pub jobs: Vec<Job>,
+    pub jobs: Vec<JobWithCompany>,
 }
 
 #[derive(Template)]

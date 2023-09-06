@@ -6,7 +6,7 @@ use serde::Deserialize;
 use sqlx::{Pool, Postgres};
 
 use crate::{
-    models::job::Job,
+    models::job::{Job, JobWithCompany},
     templates::{JobTemplate, ListJobsTemplate},
 };
 
@@ -23,31 +23,37 @@ pub async fn get_job(
 }
 
 #[derive(Deserialize)]
-pub struct Pagination {
-    page: i64,
-    per_page: i64,
-}
-
-impl Default for Pagination {
-    fn default() -> Self {
-        Self {
-            page: 1,
-            per_page: 10,
-        }
-    }
+pub struct Params {
+    search: Option<String>,
+    location: Option<String>,
+    company_id: Option<i32>,
+    sort_by: Option<String>,
+    sort_direction: Option<String>,
+    page: Option<i64>,
+    per_page: Option<i64>,
 }
 
 pub async fn list_jobs(
-    pagination: Option<Query<Pagination>>,
+    Query(params): Query<Params>,
     Extension(conn): Extension<Pool<Postgres>>,
 ) -> ListJobsTemplate {
-    let Query(pagination) = pagination.unwrap_or_default();
-
     let jobs = sqlx::query_as!(
-        Job,
-        "SELECT * FROM jobs WHERE expires_at > NOW() OR expires_at IS NULL ORDER BY id LIMIT $1 OFFSET $2",
-        pagination.per_page,
-        (pagination.page - 1) * pagination.per_page
+        JobWithCompany,
+        "SELECT jobs.*, companies.name AS company_name 
+        FROM jobs 
+        INNER JOIN companies ON jobs.company_id = companies.id 
+        WHERE (jobs.title LIKE '%' || $1 || '%') 
+        AND (jobs.location = COALESCE($2, jobs.location)) 
+        AND (jobs.company_id = COALESCE($3, jobs.company_id))
+        ORDER BY $4
+        OFFSET $5 ROWS
+        FETCH NEXT $6 ROWS ONLY",
+        params.search,
+        params.location,
+        params.company_id,
+        params.sort_by,
+        params.page,
+        params.per_page
     )
     .fetch_all(&conn)
     .await
