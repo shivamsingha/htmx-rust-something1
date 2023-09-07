@@ -2,7 +2,7 @@ use axum::{
     extract::{Path, Query},
     Extension,
 };
-use serde::Deserialize;
+use serde::{Deserialize, Deserializer};
 use sqlx::{Pool, Postgres};
 
 use crate::{
@@ -24,13 +24,44 @@ pub async fn get_job(
 
 #[derive(Deserialize)]
 pub struct Params {
+    #[serde(default, deserialize_with = "deserialize_option_string")]
     search: Option<String>,
+    #[serde(default, deserialize_with = "deserialize_option_string")]
     location: Option<String>,
+    #[serde(default, deserialize_with = "deserialize_option_i32")]
     company_id: Option<i32>,
+    #[serde(default, deserialize_with = "deserialize_option_string")]
     sort_by: Option<String>,
+    #[serde(default, deserialize_with = "deserialize_option_string")]
     sort_direction: Option<String>,
+    #[serde(default)]
     page: Option<i64>,
+    #[serde(default)]
     per_page: Option<i64>,
+}
+
+fn deserialize_option_i32<'de, D>(deserializer: D) -> Result<Option<i32>, D::Error>
+where
+    D: Deserializer<'de>,
+{
+    let s: String = Deserialize::deserialize(deserializer)?;
+    if s.is_empty() {
+        Ok(None)
+    } else {
+        Ok(Some(s.parse().unwrap()))
+    }
+}
+
+fn deserialize_option_string<'de, D>(deserializer: D) -> Result<Option<String>, D::Error>
+where
+    D: Deserializer<'de>,
+{
+    let s: String = Deserialize::deserialize(deserializer)?;
+    if s.is_empty() {
+        Ok(None)
+    } else {
+        Ok(Some(s))
+    }
 }
 
 pub async fn list_jobs(
@@ -39,20 +70,24 @@ pub async fn list_jobs(
 ) -> ListJobsTemplate {
     let jobs = sqlx::query_as!(
         JobWithCompany,
-        "SELECT jobs.*, companies.name AS company_name 
-        FROM jobs 
-        INNER JOIN companies ON jobs.company_id = companies.id 
-        WHERE (jobs.title LIKE '%' || $1 || '%') 
-        AND (jobs.location = COALESCE($2, jobs.location)) 
-        AND (jobs.company_id = COALESCE($3, jobs.company_id))
-        ORDER BY $4
-        OFFSET $5 ROWS
-        FETCH NEXT $6 ROWS ONLY",
+        "SELECT jobs.*,
+            companies.name AS company_name
+        FROM jobs
+            INNER JOIN companies ON jobs.company_id = companies.id
+        WHERE (
+                jobs.title ILIKE '%' || COALESCE($1, '%') || '%'
+                OR jobs.description ILIKE '%' || COALESCE($1, '%') || '%'
+                OR jobs.location ILIKE '%' || COALESCE($1, '%') || '%'
+                OR companies.name ILIKE '%' || COALESCE($1, '%') || '%'
+            )
+            AND (jobs.location = COALESCE($2, jobs.location))
+            AND (jobs.company_id = COALESCE($3, jobs.company_id))
+        ORDER BY $4 OFFSET $5 ROWS FETCH NEXT $6 ROWS ONLY",
         params.search,
         params.location,
         params.company_id,
         params.sort_by,
-        params.page,
+        (params.page.map(|p| (p - 1) * params.per_page.unwrap_or(0))),
         params.per_page
     )
     .fetch_all(&conn)
