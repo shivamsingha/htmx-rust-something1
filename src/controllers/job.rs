@@ -3,7 +3,7 @@ use axum::{
     Extension,
 };
 use serde::{Deserialize, Deserializer};
-use sqlx::{Pool, Postgres};
+use sqlx::{types::BigDecimal, Pool, Postgres};
 
 use crate::{
     models::job::{Job, JobWithCompany},
@@ -34,10 +34,28 @@ pub struct Params {
     sort_by: Option<String>,
     #[serde(default, deserialize_with = "deserialize_option_string")]
     sort_direction: Option<String>,
+    #[serde(default, deserialize_with = "deserialize_option_big_decimal")]
+    min_salary: Option<BigDecimal>,
+    #[serde(default, deserialize_with = "deserialize_option_big_decimal")]
+    max_salary: Option<BigDecimal>,
+    #[serde(default, deserialize_with = "deserialize_option_string")]
+    is_active: Option<String>,
     #[serde(default)]
     page: Option<i64>,
     #[serde(default)]
     per_page: Option<i64>,
+}
+
+fn deserialize_option_big_decimal<'de, D>(deserializer: D) -> Result<Option<BigDecimal>, D::Error>
+where
+    D: Deserializer<'de>,
+{
+    let s: String = Deserialize::deserialize(deserializer)?;
+    if s.is_empty() {
+        Ok(None)
+    } else {
+        Ok(Some(s.parse().unwrap()))
+    }
 }
 
 fn deserialize_option_i32<'de, D>(deserializer: D) -> Result<Option<i32>, D::Error>
@@ -72,9 +90,9 @@ pub async fn list_jobs(
         JobWithCompany,
         "SELECT jobs.*,
             companies.name AS company_name
-        FROM jobs
+            FROM jobs
             INNER JOIN companies ON jobs.company_id = companies.id
-        WHERE (
+            WHERE (
                 jobs.title ILIKE '%' || COALESCE($1, '%') || '%'
                 OR jobs.description ILIKE '%' || COALESCE($1, '%') || '%'
                 OR jobs.location ILIKE '%' || COALESCE($1, '%') || '%'
@@ -82,13 +100,26 @@ pub async fn list_jobs(
             )
             AND (jobs.location = COALESCE($2, jobs.location))
             AND (jobs.company_id = COALESCE($3, jobs.company_id))
-        ORDER BY $4 OFFSET $5 ROWS FETCH NEXT $6 ROWS ONLY",
+            AND (jobs.salary >= COALESCE($7, jobs.salary))
+            AND (jobs.salary <= COALESCE($8, jobs.salary))
+            AND (
+                jobs.expires_at > 
+                CASE
+                    WHEN $9 = 'on' THEN NOW()
+                    ELSE '1980-01-01 00:00:00'
+                END
+                OR jobs.expires_at IS NULL
+            )
+            ORDER BY $4 OFFSET $5 ROWS FETCH NEXT $6 ROWS ONLY",
         params.search,
         params.location,
         params.company_id,
         params.sort_by,
         (params.page.map(|p| (p - 1) * params.per_page.unwrap_or(0))),
-        params.per_page
+        params.per_page,
+        params.min_salary,
+        params.max_salary,
+        params.is_active
     )
     .fetch_all(&conn)
     .await

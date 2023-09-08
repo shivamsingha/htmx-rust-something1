@@ -25,28 +25,27 @@
         {% endfor %}
     </select>
 
-    <label for="salary[gte]">Minimum Salary</label>
+    <label for="min_salary">Minimum Salary</label>
     <input
         type="number"
-        name="salary[gte]"
-        id="salary[gte]"
+        name="min_salary"
+        id="min_salary"
         min="0"
-        max="1000000"
     />
-    <label for="salary[lte]">Maximum Salary</label>
+    <label for="max_salary">Maximum Salary</label>
     <input
         type="number"
-        name="salary[lte]"
-        id="salary[lte]"
+        name="max_salary"
+        id="max_salary"
         min="0"
-        max="1000000"
     />
 
     <label for="sort_by">Sort By:</label>
     <select name="sort_by" id="sort_by">
-        <option value="" disabled selected></option>
-        <option value="title">Title</option>
-        <option value="salary">Salary</option>
+        <option value="jobs.id" selected>None</option>
+        <option value="jobs.title">Title</option>
+        <option value="jobs.salary">Salary</option>
+        <option value="companies.name">Company</option>
     </select>
 
     <label for="sort_direction">Sort Direction:</label>
