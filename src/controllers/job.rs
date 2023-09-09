@@ -82,6 +82,7 @@ where
     }
 }
 
+// TODO: sort_direction
 pub async fn list_jobs(
     Query(params): Query<Params>,
     Extension(conn): Extension<Pool<Postgres>>,
@@ -90,9 +91,9 @@ pub async fn list_jobs(
         JobWithCompany,
         "SELECT jobs.*,
             companies.name AS company_name
-            FROM jobs
+        FROM jobs
             INNER JOIN companies ON jobs.company_id = companies.id
-            WHERE (
+        WHERE (
                 jobs.title ILIKE '%' || COALESCE($1, '%') || '%'
                 OR jobs.description ILIKE '%' || COALESCE($1, '%') || '%'
                 OR jobs.location ILIKE '%' || COALESCE($1, '%') || '%'
@@ -103,14 +104,24 @@ pub async fn list_jobs(
             AND (jobs.salary >= COALESCE($7, jobs.salary))
             AND (jobs.salary <= COALESCE($8, jobs.salary))
             AND (
-                jobs.expires_at > 
-                CASE
-                    WHEN $9 = 'on' THEN NOW()
-                    ELSE '1980-01-01 00:00:00'
+                jobs.expires_at > CASE $9
+                    WHEN 'on' THEN NOW()
+                    ELSE '1900-01-01 00:00:00'::TIMESTAMP
                 END
                 OR jobs.expires_at IS NULL
             )
-            ORDER BY $4 OFFSET $5 ROWS FETCH NEXT $6 ROWS ONLY",
+        ORDER BY (
+                CASE
+                    $4
+                    WHEN 'title' THEN jobs.title
+                    WHEN 'company' THEN companies.name
+                END,
+                CASE
+                    $4
+                    WHEN 'id' THEN jobs.id
+                    WHEN 'salary' THEN jobs.salary
+                END
+            ) OFFSET $5 ROWS FETCH NEXT $6 ROWS ONLY",
         params.search,
         params.location,
         params.company_id,
