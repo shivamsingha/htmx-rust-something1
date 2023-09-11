@@ -1,73 +1,121 @@
 {% extends "base.html" %} {% block body %}
-<form hx-get="/jobs" hx-trigger="change" hx-target="#jobs-box">
-    <label for="Search">Search</label>
+<div class="bg-base-100 drawer lg:drawer-open">
+<form
+    hx-get="/jobs"
+    hx-trigger="change"
+    hx-target="#jobs-box"
+    class="form-control"
+>
+    <label class="label" for="search"
+        ><span class="label-text">Search</span></label
+    >
     <input
         type="text"
         name="search"
         id="search"
         placeholder="Search Job Title, Company, Description"
+        class="input input-bordered w-full max-w-xs"
     />
 
-    <select name="company_id" id="company_id" multiple>
-        <option value="" disabled selected>Filter by Company</option>
+    <select
+        name="company_id"
+        id="company_id"
+        class="select select-bordered w-full max-w-xs"
+    >
+        <option value="" disabled selected>
+            <span class="label-text">Filter by Company</span>
+        </option>
         {% for company in companies %}
         <option value="{{ company.id }}">{{ company.name }}</option>
         {% endfor %}
     </select>
 
-    <label for="is_active">Active</label>
-    <input type="checkbox" name="is_active" id="is_active" checked />
+    <label class="label cursor-pointer" for="is_active"
+        ><span class="label-text">Active</span></label
+    >
+    <input
+        type="checkbox"
+        name="is_active"
+        id="is_active"
+        class="toggle"
+        checked
+    />
 
-    <select name="location" id="location" multiple>
-        <option value="" disabled selected>Filter by Location</option>
+    <select
+        name="location"
+        id="location"
+        class="select select-bordered w-full max-w-xs"
+    >
+        <option value="" disabled selected>
+            <span class="label-text">Filter by Location</span>
+        </option>
         {% for x in locations %}
         <option value="{{ x.location }}">{{ x.location }}</option>
         {% endfor %}
     </select>
 
-    <label for="min_salary">Minimum Salary</label>
-    <input
-        type="number"
-        name="min_salary"
-        id="min_salary"
-        min="0"
-    />
-    <label for="max_salary">Maximum Salary</label>
-    <input
-        type="number"
-        name="max_salary"
-        id="max_salary"
-        min="0"
-    />
+    <label class="label" for="min_salary"
+        ><span class="label-text">Minimum Salary</span></label
+    >
+    <input type="number" name="min_salary" id="min_salary" min="0" />
+    <label class="label" for="max_salary"
+        ><span class="label-text">Maximum Salary</span></label
+    >
+    <input type="number" name="max_salary" id="max_salary" min="0" />
 
-    <label for="sort_by">Sort By:</label>
-    <select name="sort_by" id="sort_by">
+    <label class="label" for="sort_by"
+        ><span class="label-text">Sort By:</span></label
+    >
+    <select
+        name="sort_by"
+        id="sort_by"
+        class="select select-bordered w-full max-w-xs"
+    >
         <option value="id" selected>None</option>
         <option value="title">Title</option>
         <option value="salary">Salary</option>
         <option value="company">Company</option>
     </select>
 
-    <label for="sort_direction">Sort Direction:</label>
-    <select name="sort_direction" id="sort_direction">
+    <label class="label" for="sort_direction"
+        ><span class="label-text">Sort Direction:</span></label
+    >
+    <select
+        name="sort_direction"
+        id="sort_direction"
+        class="select select-bordered w-full max-w-xs"
+    >
         <option value="" disabled selected></option>
         <option value="asc">Ascending</option>
         <option value="desc">Descending</option>
     </select>
 
-    <label for="per_page">Per Page:</label>
-    <select name="per_page" id="per_page">
+    <label class="label" for="per_page"
+        ><span class="label-text">Per Page:</span></label
+    >
+    <select
+        name="per_page"
+        id="per_page"
+        class="select select-bordered w-full max-w-xs"
+    >
         <option value="10" selected>10</option>
         <option value="20">20</option>
         <option value="50">50</option>
         <option value="100">100</option>
     </select>
 
-    <label for="page">Page:</label>
-    <select name="page" id="page">
+    <label class="label" for="page"
+        ><span class="label-text">Page:</span></label
+    >
+    <select
+        name="page"
+        id="page"
+        class="select select-bordered w-full max-w-xs"
+    >
         <option value="1" selected>1</option>
         <option value="2">2</option>
     </select>
 </form>
 <div id="jobs-box">{% include "partials/list_jobs.html" %}</div>
+</div>
 {% endblock body %}
