@@ -1,11 +1,14 @@
 use axum::{routing::get, Extension, Router};
 use dotenvy_macro::dotenv;
-use htmx_rust_something1::controllers::{
-    applicant::get_applicant,
-    application::get_application,
-    company::get_company,
-    home::home,
-    job::{get_job, list_jobs},
+use htmx_rust_something1::{
+    controllers::{
+        applicant::get_applicant,
+        application::get_application,
+        company::get_company,
+        home::home,
+        job::{get_job, list_jobs},
+    },
+    templates::CompanyCreateTemplate,
 };
 use sqlx::postgres::PgPoolOptions;
 use tower::ServiceBuilder;
@@ -23,6 +26,10 @@ async fn main() {
 
     let app = Router::new()
         .route("/", get(home))
+        .route(
+            "/company/create",
+            get(|| async { CompanyCreateTemplate {} }),
+        )
         .route("/company/:id", get(get_company))
         .route("/job/:id", get(get_job))
         .route("/jobs", get(list_jobs))

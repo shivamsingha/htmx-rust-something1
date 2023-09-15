@@ -34,6 +34,10 @@ pub struct CompanyTemplate {
 }
 
 #[derive(Template)]
+#[template(path = "company_create.html")]
+pub struct CompanyCreateTemplate {}
+
+#[derive(Template)]
 #[template(path = "job.html")]
 pub struct JobTemplate {
     pub job: Job,
