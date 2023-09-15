@@ -6,7 +6,7 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-axum = { version = "0.6.20", features = ["headers", "json"] }
+axum = { version = "0.6.20", features = ["headers", "json", "multipart"] }
 tokio = { version = "1.31.0", features = ["full"] }
 serde = { version = "1.0.183", features = ["derive"] }
 serde_json = "1.0.104"
@@ -17,3 +17,7 @@ askama = { version = "0.12.0", features = ["with-axum", "serde-json"] }
 askama_axum = "0.3.0"
 dotenvy = "0.15.7"
 dotenvy_macro = "0.15.7"
+reqwest = { version = "0.11.20", features = ["json", "multipart", "stream"] }
+futures = "0.3.28"
+bytes = "1.5.0"
+base64 = "0.21.4"
